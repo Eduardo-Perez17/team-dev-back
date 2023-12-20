@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 
 // DTO'S
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 // Entity
 import { User } from './entities/user.entity';
@@ -47,7 +48,62 @@ export class UsersService {
     }
   }
 
+  async getAllUsers(): Promise<User[]> {
+    try {
+      return this.usersRepository.find();
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async getUserById({ id }: { id: number }): Promise<User> {
+    try {
+      const user: User = await this.usersRepository.findOneBy({ id });
+
+      if (!user) {
+        throw new ErrorManager({
+          type: 'NOT_FOUND',
+          message: 'This user not found',
+        });
+      }
+
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async editUser({ id, body }: { id: number; body: UpdateUserDto }) {
+    try {
+      if (body.email) {
+        throw new ErrorManager({
+          type: 'BAD_REQUEST',
+          message: 'The email is not editable',
+        });
+      }
+
+      const user: User = await this.getUserById({ id });
+
+      const updateUser: UpdateUserDto = Object.assign(user, body);
+      await this.usersRepository.update(id, updateUser);
+      return updateUser;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async deleteUser({ id }: { id: number }): Promise<User> {
+    const user: User = await this.getUserById({ id });
+
+    await this.usersRepository.delete(id);
+    return user;
+  }
+
   findByEmail({ email }: { email: string }) {
-    return this.usersRepository.findOne({ where: { email } });
+    try {
+      return this.usersRepository.findOne({ where: { email } });
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 }
