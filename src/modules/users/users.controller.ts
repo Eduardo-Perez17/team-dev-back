@@ -8,6 +8,7 @@ import {
   Param,
   Put,
   Delete,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -32,6 +33,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 
 // Commons
 import { ROLES } from '../../commons/models';
+import { JwtPayload } from 'src/commons/types';
 
 // Interceptors
 import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';
@@ -40,7 +42,7 @@ import { ResponseInterceptor } from '../../commons/interceptors/response.interce
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @UseInterceptors(ResponseInterceptor)
@@ -85,10 +87,10 @@ export class UsersController {
     status: 200,
     type: () => User,
   })
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Get()
-  getAllUsers(): Promise<User[]> {
-    return this.usersService.getAllUsers();
+  getAllUsers(@Req() req: JwtPayload): Promise<User[]> {
+    return this.usersService.getAllUsers({ req });
   }
 
   @ApiBearerAuth()
@@ -108,10 +110,10 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Get(':id')
-  getUserById(@Param('id') id: number): Promise<User> {
-    return this.usersService.getUserById({ id });
+  getUserById(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
+    return this.usersService.getUserById({ id, req });
   }
 
   @ApiBearerAuth()
@@ -131,13 +133,14 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Put(':id')
   editUser(
     @Param('id') id: number,
     @Body() body: UpdateUserDto,
+    @Req() req: JwtPayload,
   ): Promise<UpdateUserDto> {
-    return this.usersService.editUser({ id, body });
+    return this.usersService.editUser({ id, body, req });
   }
 
   @ApiBearerAuth()
@@ -157,9 +160,13 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
-  @Roles(ROLES.SUPERADMIN)
+  @ApiResponse({
+    status: 403,
+    type: () => 'You are not allowed to delete your own profile.',
+  })
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Delete(':id')
-  deleteUser(@Param('id') id: number): Promise<User> {
-    return this.usersService.deleteUser({ id });
+  deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
+    return this.usersService.deleteUser({ id, req });
   }
 }

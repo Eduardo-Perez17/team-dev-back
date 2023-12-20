@@ -11,7 +11,10 @@ import { User } from './entities/user.entity';
 
 // Commons
 import { ErrorManager } from '../../commons/utils/error.manager';
-import { REJEXT_PASSWORD } from 'src/commons/constants';
+import { REJEXT_PASSWORD } from '../../commons/constants';
+import { JwtPayload } from '../../commons/types';
+import { ROLES } from 'src/commons/models';
+import { returnErrorManager } from 'src/commons/utils/returnError.manager';
 
 @Injectable()
 export class UsersService {
@@ -48,32 +51,55 @@ export class UsersService {
     }
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers({ req }: { req: JwtPayload }): Promise<User[]> {
     try {
+      if (req.user.role === ROLES.ADMIN) {
+        return this.usersRepository.find({ where: { role: ROLES.USER } });
+      }
+
       return this.usersRepository.find();
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  async getUserById({ id }: { id: number }): Promise<User> {
+  async getUserById({
+    id,
+    req,
+  }: {
+    id: number;
+    req: JwtPayload;
+  }): Promise<User> {
     try {
-      const user: User = await this.usersRepository.findOneBy({ id });
-
-      if (!user) {
-        throw new ErrorManager({
-          type: 'NOT_FOUND',
-          message: 'This user not found',
+      if (req.user.role === ROLES.ADMIN) {
+        const user: User = await this.usersRepository.findOne({
+          where: { id, role: ROLES.USER },
         });
+
+        // we return an error if the condition does not pass
+        returnErrorManager({ user });
+        return user;
       }
 
+      const user: User = await this.usersRepository.findOneBy({ id });
+
+      // we return an error if the condition does not pass
+      returnErrorManager({ user });
       return user;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  async editUser({ id, body }: { id: number; body: UpdateUserDto }) {
+  async editUser({
+    id,
+    body,
+    req,
+  }: {
+    id: number;
+    body: UpdateUserDto;
+    req: JwtPayload;
+  }) {
     try {
       if (body.email) {
         throw new ErrorManager({
@@ -82,7 +108,7 @@ export class UsersService {
         });
       }
 
-      const user: User = await this.getUserById({ id });
+      const user: User = await this.getUserById({ id, req });
 
       const updateUser: UpdateUserDto = Object.assign(user, body);
       await this.usersRepository.update(id, updateUser);
@@ -92,11 +118,28 @@ export class UsersService {
     }
   }
 
-  async deleteUser({ id }: { id: number }): Promise<User> {
-    const user: User = await this.getUserById({ id });
+  async deleteUser({
+    id,
+    req,
+  }: {
+    id: number;
+    req: JwtPayload;
+  }): Promise<User> {
+    try {
+      if (Number(id) === req.user.sub) {
+        throw new ErrorManager({
+          type: 'FORBIDDEN',
+          message: 'You are not allowed to delete your own profile',
+        });
+      }
 
-    await this.usersRepository.delete(id);
-    return user;
+      const user: User = await this.getUserById({ id, req });
+
+      await this.usersRepository.delete(id);
+      return user;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
   findByEmail({ email }: { email: string }) {

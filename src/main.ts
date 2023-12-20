@@ -18,10 +18,10 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   const config = new DocumentBuilder()
-    .setTitle('Template Proyects')
-    .setDescription('The template project API description')
+    .setTitle('Team dev')
+    .setDescription('Official API for the Team Dev platform')
     .setVersion('1.0')
-    .addTag('tamplate project')
+    .addTag('Team Dev')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/v1/docs', app, document);
