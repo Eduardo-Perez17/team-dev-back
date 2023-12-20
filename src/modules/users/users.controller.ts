@@ -68,10 +68,13 @@ export class UsersController {
     type: () => 'CONFLICT',
     description: 'The email already exists.',
   })
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Post()
-  createUser(@Body() body: CreateUserDto): Promise<User> {
-    return this.usersService.createUser({ body });
+  createUser(
+    @Body() body: CreateUserDto,
+    @Req() req: JwtPayload,
+  ): Promise<User> {
+    return this.usersService.createUser({ body, req });
   }
 
   @ApiBearerAuth()

@@ -22,8 +22,24 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async createUser({ body }: { body: CreateUserDto }): Promise<User> {
+  async createUser({
+    body,
+    req,
+  }: {
+    body: CreateUserDto;
+    req: JwtPayload;
+  }): Promise<User> {
     try {
+      if (req.user.role === ROLES.ADMIN) {
+        if (body.role === ROLES.ADMIN || body.role === ROLES.SUPERADMIN) {
+          throw new ErrorManager({
+            type: 'FORBIDDEN',
+            message:
+              'As an admin you do not have permissions to create users with an administrator or super administrator role.',
+          });
+        }
+      }
+
       const user: User = await this.findByEmail({ email: body.email });
 
       if (user) {
