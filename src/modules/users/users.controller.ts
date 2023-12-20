@@ -20,17 +20,18 @@ import { UsersService } from './users.service';
 import { CreateUserDto, ResponseCreateUserDto } from './dto/create-user.dto';
 
 // Guards
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 
 // Decorators
-import { Roles } from '../auth/decorators/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 
 // Commons
-import { ROLES } from '../commons/models';
+import { ROLES } from '../../commons/models';
 
 // Interceptors
-import { ResponseInterceptor } from '../commons/interceptors/response.interceptor';
+import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';
+import { IsPublic } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('users')
 @Controller('users')
@@ -39,6 +40,7 @@ import { ResponseInterceptor } from '../commons/interceptors/response.intercepto
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @IsPublic()
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create user.',

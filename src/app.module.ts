@@ -10,7 +10,7 @@ import { AppService } from './app.service';
 import { AuthService } from './auth/services/auth/auth.service';
 
 // Module
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 

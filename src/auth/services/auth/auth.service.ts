@@ -3,10 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
 // Services
-import { UsersService } from '../../../users/users.service';
+import { UsersService } from '../../../modules/users/users.service';
 
 // Entity
-import { User } from '../../../users/entities/user.entity';
+import { User } from '../../../modules/users/entities/user.entity';
 
 // Models
 import { PayloadToken } from '../../models/token.model';

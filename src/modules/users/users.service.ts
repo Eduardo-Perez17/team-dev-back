@@ -9,13 +9,15 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
 // Commons
-import { ErrorManager } from 'src/commons/utils/error.manager';
+import { ErrorManager } from '../../commons/utils/error.manager';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
+
+  // ! el rol siempre tiene que llegar en minusculas
 
   async create(data: CreateUserDto) {
     try {
