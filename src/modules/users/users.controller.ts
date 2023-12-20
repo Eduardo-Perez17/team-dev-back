@@ -31,7 +31,9 @@ import { ROLES } from '../../commons/models';
 
 // Interceptors
 import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';
-import { IsPublic } from 'src/auth/decorators/public.decorator';
+
+// Entities
+import { User } from './entities/user.entity';
 
 @ApiTags('users')
 @Controller('users')
@@ -40,7 +42,6 @@ import { IsPublic } from 'src/auth/decorators/public.decorator';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @IsPublic()
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create user.',
@@ -55,9 +56,14 @@ export class UsersController {
     type: () => ResponseCreateUserDto,
     description: 'create user successfully.',
   })
+  @ApiResponse({
+    status: 409,
+    type: () => 'CONFLICT',
+    description: 'The email already exists.',
+  })
   @Roles(ROLES.SUPERADMIN)
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  createUser(@Body() body: CreateUserDto): Promise<User> {
+    return this.usersService.createUser({ body });
   }
 }
