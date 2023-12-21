@@ -12,8 +12,8 @@ import { User } from '../../../modules/users/entities/user.entity';
 import { PayloadToken } from '../../models/token.model';
 
 // Interfaces
-import { IAuthLogin } from 'src/commons/Interface/auth.interface';
-import { ErrorManager } from 'src/commons/utils/error.manager';
+import { IAuthLogin } from '../../../../src/commons/Interface/auth.interface';
+import { ErrorManager } from '../../../../src/commons/utils/error.manager';
 
 @Injectable()
 export class AuthService {

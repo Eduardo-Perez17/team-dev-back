@@ -11,6 +11,7 @@ import { AuthService } from './auth/services/auth/auth.service';
 // Module
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { PostsModule } from './modules/posts/posts.module';
 import { AuthModule } from './auth/auth.module';
 
 // Const
@@ -27,6 +28,7 @@ import { configSchema } from '../config/validationSchema';
       validationSchema: configSchema,
     }),
     UsersModule,
+    PostsModule,
     DatabaseModule,
     AuthModule,
     JwtModule,

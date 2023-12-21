@@ -33,7 +33,7 @@ import { Roles } from '../../auth/decorators/roles.decorator';
 
 // Commons
 import { ROLES } from '../../commons/models';
-import { JwtPayload } from 'src/commons/types';
+import { JwtPayload } from '../../../src/commons/types';
 
 // Interceptors
 import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';

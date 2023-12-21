@@ -1,7 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 // Commons
-import { ROLES } from 'src/commons/models';
+import { ROLES } from '../../../../src/commons/models';
 
 export class CreateUserDto {
   @IsNotEmpty()

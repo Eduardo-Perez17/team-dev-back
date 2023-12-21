@@ -14,7 +14,7 @@ import { ErrorManager } from '../../commons/utils/error.manager';
 import { REJEXT_PASSWORD } from '../../commons/constants';
 import { JwtPayload } from '../../commons/types';
 import { ROLES } from 'src/commons/models';
-import { returnErrorManager } from 'src/commons/utils/returnError.manager';
+import { returnErrorManager } from '../../../src/commons/utils/returnError.manager';
 
 @Injectable()
 export class UsersService {

@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 // Models
-import { ROLES } from 'src/commons/models';
+import { ROLES } from '../../../src/commons/models';
 import { PayloadToken } from '../models/token.model';
 
 @Injectable()
