@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -12,6 +13,7 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 
@@ -22,6 +24,7 @@ import { PostsService } from './posts.service';
 import { CreatePostDto, ResponseCreatePostDto } from './dto/createPost.dto';
 
 // Entities
+import { Image } from './entities/image.entity';
 import { Posts } from './entities/posts.entity';
 
 // Commons
@@ -33,6 +36,7 @@ import { Roles } from '../../../src/auth/decorators/roles.decorator';
 // Helpers
 import { fileFilter, renameImage } from 'src/commons/helpers';
 
+@ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postService: PostsService) {}
@@ -51,6 +55,10 @@ export class PostsController {
     type: () => ResponseCreatePostDto,
     description: 'upload image successfully.',
   })
+  @ApiResponse({
+    status: 401,
+    description: 'image exist.',
+  })
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -62,7 +70,25 @@ export class PostsController {
     }),
   )
   uploadFile(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    return this.postService.uploadFile({ file });
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'get image by id.',
+    description: 'this endpoint is for get image by id.',
+  })
+  @ApiBody({
+    type: CreatePostDto,
+    description: 'The fields to be get image by id.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'image not found.',
+  })
+  @Get('upload/:image')
+  getFileById(@Param('image') image: string): Promise<Image> {
+    return this.postService.getFileByName({ image });
   }
 
   @ApiBearerAuth()
