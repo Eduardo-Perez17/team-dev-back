@@ -19,7 +19,18 @@ export class PostsService {
 
   async createPost({ body }: { body: CreatePostDto }): Promise<Posts> {
     try {
-      const post: Posts = await this.findByUrl({ url: body.url });
+      // we generate the url of the post
+      const separationOfTitle = body.title;
+      const separationOfTitleResult = separationOfTitle
+        .split(' ')
+        .join('-')
+        .toLowerCase();
+
+      body.url = separationOfTitleResult;
+
+      const post: Posts = await this.findByUrl({
+        url: separationOfTitleResult,
+      });
 
       if (post) {
         throw new ErrorManager({
@@ -27,8 +38,6 @@ export class PostsService {
           message: 'The url already exists',
         });
       }
-
-      console.log(body.title);
 
       const newPost: Posts = this.postsRepository.create(body);
       return this.postsRepository.save(newPost);

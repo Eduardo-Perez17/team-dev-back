@@ -9,9 +9,10 @@ import { PostsController } from './posts.controller';
 
 // Entities
 import { Posts } from './entities/posts.entity';
+import { Image } from './entities/image.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Posts])],
+  imports: [TypeOrmModule.forFeature([Posts, Image])],
   controllers: [PostsController],
   providers: [PostsService],
 })

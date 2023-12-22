@@ -9,6 +9,8 @@ export class CreatePostDto {
   @IsString()
   content: string;
 
+  @IsNotEmpty()
+  @IsString()
   url: string;
 
   @IsNotEmpty()

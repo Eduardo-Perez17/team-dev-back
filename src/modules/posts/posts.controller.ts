@@ -1,10 +1,19 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
 
 // Services
 import { PostsService } from './posts.service';
@@ -21,9 +30,40 @@ import { ROLES } from '../../../src/commons/models';
 // Decorators
 import { Roles } from '../../../src/auth/decorators/roles.decorator';
 
+// Helpers
+import { fileFilter, renameImage } from 'src/commons/helpers';
+
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postService: PostsService) {}
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Upload image.',
+    description: 'this endpoint is for upload an image.',
+  })
+  @ApiBody({
+    type: CreatePostDto,
+    description: 'The fields to be upload image.',
+  })
+  @ApiResponse({
+    status: 201,
+    type: () => ResponseCreatePostDto,
+    description: 'upload image successfully.',
+  })
+  @Post('upload')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './upload',
+        filename: renameImage,
+      }),
+      fileFilter: fileFilter,
+    }),
+  )
+  uploadFile(@UploadedFile() file: Express.Multer.File) {
+    console.log(file);
+  }
 
   @ApiBearerAuth()
   @ApiOperation({

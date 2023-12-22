@@ -1,10 +1,17 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 // Commons
 import { BaseEntity } from '../../../commons/baseEntity';
 
 // Interfaces
 import { IPost } from '../../../commons/Interface/post.interface';
+import { Image } from './image.entity';
 
 @Entity({ name: 'Posts' })
 export class Posts extends BaseEntity implements IPost {
@@ -13,9 +20,6 @@ export class Posts extends BaseEntity implements IPost {
 
   @Column({ type: 'text', default: null })
   content: string;
-
-  @Column({ type: 'varchar', length: 50, default: null })
-  img: string;
 
   @Column({ type: 'boolean', default: true })
   published: boolean;
@@ -28,4 +32,8 @@ export class Posts extends BaseEntity implements IPost {
 
   @Column({ type: 'varchar', length: 50, default: null, unique: true })
   url: string;
+
+  @OneToOne(() => Image, (image) => image.post)
+  @JoinColumn()
+  image: Image;
 }
