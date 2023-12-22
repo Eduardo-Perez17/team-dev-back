@@ -39,8 +39,8 @@ export class PostsService {
   async createPost({ body }: { body: CreatePostDto }): Promise<Posts> {
     try {
       // we generate the url of the post
-      const separationOfTitle = body.title;
-      const separationOfTitleResult = separationOfTitle
+      const separationOfTitle: string = body.title;
+      const separationOfTitleResult: string = separationOfTitle
         .split(' ')
         .join('-')
         .toLowerCase();
@@ -52,9 +52,11 @@ export class PostsService {
       });
 
       // assign image a post
-      const image = await this.imageRepository.findOneBy({ id: body.imageId });
+      const image: Image = await this.imageRepository.findOneBy({
+        id: body.imageId,
+      });
 
-      const assignImagePost = this.postsRepository.create({
+      const assignImagePost: Posts = this.postsRepository.create({
         ...body,
         image,
         createdAt: new Date(),
@@ -83,7 +85,7 @@ export class PostsService {
         });
       }
 
-      return;
+      return post;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -91,7 +93,7 @@ export class PostsService {
 
   async getFileByName({ image }: { image: string }) {
     try {
-      const imageFound = await this.imageRepository.findOne({
+      const imageFound: Image = await this.imageRepository.findOne({
         where: { image },
       });
 
