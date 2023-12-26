@@ -7,6 +7,7 @@ import { Posts } from './entities/posts.entity';
 import { Image } from './entities/image.entity';
 
 // Dto's
+import { EditPostDto } from './dto/editPost.dto';
 import { CreatePostDto } from './dto/createPost.dto';
 
 // Utils
@@ -69,10 +70,18 @@ export class PostsService {
   }
 
   async getAllPost(): Promise<Posts[]> {
-    return this.postsRepository.find();
+    try {
+      const posts: Posts[] = await this.postsRepository.find({
+        relations: ['image'],
+      });
+
+      return posts;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
   }
 
-  async findByUrl({ url }: { url: string }) {
+  async findByUrl({ url }: { url: string }): Promise<Posts> {
     try {
       const post: Posts = await this.postsRepository.findOne({
         where: { url },
@@ -91,7 +100,60 @@ export class PostsService {
     }
   }
 
-  async getFileByName({ image }: { image: string }) {
+  async getPostById({ id }: { id: number }): Promise<Posts> {
+    try {
+      const post: Posts = await this.postsRepository.findOneBy({ id });
+
+      if (!post) {
+        throw new ErrorManager({
+          type: 'NOT_FOUND',
+          message: 'This post not found',
+        });
+      }
+
+      return post;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async updatePost({
+    id,
+    body,
+  }: {
+    id: number;
+    body: EditPostDto;
+  }): Promise<Posts> {
+    try {
+      const post: Posts = await this.getPostById({ id });
+
+      const updatePost: Posts = Object.assign(post, body);
+      await this.postsRepository.update(id, updatePost);
+      return updatePost;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async deletePost({ id }: { id: number }): Promise<Posts> {
+    try {
+      const post: Posts = await this.getPostById({ id });
+
+      if (post.published) {
+        throw new ErrorManager({
+          type: 'CONFLICT',
+          message: 'This post is public',
+        });
+      }
+
+      await this.postsRepository.delete(id);
+      return post;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async getFileByName({ image }: { image: string }): Promise<Image> {
     try {
       const imageFound: Image = await this.imageRepository.findOne({
         where: { image },
