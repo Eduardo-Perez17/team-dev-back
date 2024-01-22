@@ -1,8 +1,8 @@
 import {
   Column,
   Entity,
-  JoinColumn,
-  OneToOne,
+  // JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -33,7 +33,6 @@ export class Posts extends BaseEntity implements IPost {
   @Column({ type: 'varchar', length: 50, default: null, unique: true })
   url: string;
 
-  @OneToOne(() => Image, (image) => image.post)
-  @JoinColumn()
+  @ManyToOne(() => Image, (image) => image.post)
   image: Image;
 }
