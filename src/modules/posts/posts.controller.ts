@@ -23,38 +23,20 @@ import { CreatePostDto } from './dto/createPost.dto';
 import { EditPostDto } from './dto/editPost.dto';
 
 // Entities
-import { Image } from './entities/image.entity';
 import { Posts } from './entities/posts.entity';
 
 // Commons
-import { ROLES } from '../../../src/commons/models';
+import { ROLES } from 'src/commons/models';
 
 // Decorators
-import { Roles } from '../../../src/auth/decorators/roles.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postService: PostsService) {}
 
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'get image by id.',
-    description: 'this endpoint is for get image by id.',
-  })
-  @ApiBody({
-    type: CreatePostDto,
-    description: 'The fields to be get image by id.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'image not found.',
-  })
-  @Get('upload/:image')
-  getFileById(@Param('image') image: string): Promise<Image> {
-    return this.postService.getFileByName({ image });
-  }
-
+  // Create Post
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create post.',
@@ -66,6 +48,7 @@ export class PostsController {
   })
   @ApiResponse({
     status: 201,
+    type: CreatePostDto,
     description: 'create post successfully.',
   })
   @ApiResponse({
@@ -79,6 +62,7 @@ export class PostsController {
     return this.postService.createPost({ body });
   }
 
+  // List all post
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'List all post.',
@@ -98,6 +82,7 @@ export class PostsController {
     return this.postService.getAllPost();
   }
 
+  // Get post by id
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'get post by id.',
@@ -117,6 +102,7 @@ export class PostsController {
     return this.postService.getPostById({ id });
   }
 
+  // Update post by id
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'update post by id.',
@@ -143,6 +129,7 @@ export class PostsController {
     return this.postService.updatePost({ id, body });
   }
 
+  // Delete post by
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'delete post by id.',

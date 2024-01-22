@@ -11,7 +11,7 @@ import { EditPostDto } from './dto/editPost.dto';
 import { CreatePostDto } from './dto/createPost.dto';
 
 // Utils
-import { ErrorManager } from '../../../src/commons/utils/error.manager';
+import { ErrorManager } from 'src/commons/utils/error.manager';
 
 @Injectable()
 export class PostsService {
@@ -20,6 +20,7 @@ export class PostsService {
     @InjectRepository(Image) private imageRepository: Repository<Image>,
   ) {}
 
+  // Upload file
   async uploadFile({ file }: { file: Express.Multer.File }) {
     try {
       await this.getFileByName({
@@ -37,6 +38,7 @@ export class PostsService {
     }
   }
 
+  // Create post
   async createPost({ body }: { body: CreatePostDto }): Promise<any> {
     try {
       // we generate the url of the post
@@ -58,6 +60,7 @@ export class PostsService {
     }
   }
 
+  // Get all post
   async getAllPost(): Promise<Posts[]> {
     try {
       const posts: Posts[] = await this.postsRepository.find({
@@ -70,6 +73,7 @@ export class PostsService {
     }
   }
 
+  // Find by url
   async findByUrl({ url }: { url: string }): Promise<Posts> {
     try {
       const post: Posts = await this.postsRepository.findOne({
@@ -89,6 +93,7 @@ export class PostsService {
     }
   }
 
+  // Get post by id
   async getPostById({ id }: { id: number }): Promise<Posts> {
     try {
       const post: Posts = await this.postsRepository.findOneBy({ id });
@@ -106,6 +111,7 @@ export class PostsService {
     }
   }
 
+  // Update post by id
   async updatePost({
     id,
     body,
@@ -124,6 +130,7 @@ export class PostsService {
     }
   }
 
+  // Delete post by id
   async deletePost({ id }: { id: number }): Promise<Posts> {
     try {
       const post: Posts = await this.getPostById({ id });
@@ -142,6 +149,7 @@ export class PostsService {
     }
   }
 
+  // Get file by name
   async getFileByName({ image }: { image: string }): Promise<Image> {
     try {
       const imageFound: Image = await this.imageRepository.findOne({
