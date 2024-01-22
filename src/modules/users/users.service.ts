@@ -10,11 +10,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 // Commons
-import { ErrorManager } from '../../commons/utils/error.manager';
-import { REJEXT_PASSWORD } from '../../commons/constants';
-import { JwtPayload } from '../../commons/types';
+import { returnErrorManager } from 'src/commons/utils/returnError.manager';
+import { ErrorManager } from 'src/commons/utils/error.manager';
+import { REJEXT_PASSWORD } from 'src/commons/constants';
+import { JwtPayload } from 'src/commons/types';
 import { ROLES } from 'src/commons/models';
-import { returnErrorManager } from '../../../src/commons/utils/returnError.manager';
 
 @Injectable()
 export class UsersService {
@@ -22,24 +22,10 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
-  async createUser({
-    body,
-    req,
-  }: {
-    body: CreateUserDto;
-    req: JwtPayload;
-  }): Promise<User> {
+  // Create User
+  async createUser({ body }: { body: CreateUserDto }): Promise<User> {
     try {
-      if (req.user.role === ROLES.ADMIN) {
-        if (body.role === ROLES.ADMIN || body.role === ROLES.SUPERADMIN) {
-          throw new ErrorManager({
-            type: 'FORBIDDEN',
-            message:
-              'As an admin you do not have permissions to create users with an administrator or super administrator role.',
-          });
-        }
-      }
-
+      // Serach user by email
       const user: User = await this.findByEmail({ email: body.email });
 
       if (user) {
@@ -67,18 +53,22 @@ export class UsersService {
     }
   }
 
+  // Get All Users
   async getAllUsers({ req }: { req: JwtPayload }): Promise<User[]> {
     try {
+      // If role is ADMIN list all role USER
       if (req.user.role === ROLES.ADMIN) {
         return this.usersRepository.find({ where: { role: ROLES.USER } });
       }
 
+      // Otherwise, return to all users
       return this.usersRepository.find();
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
 
+  // Get user by id
   async getUserById({
     id,
     req,
@@ -87,6 +77,7 @@ export class UsersService {
     req: JwtPayload;
   }): Promise<User> {
     try {
+      // If role is ADMIN i want to return the users that are only USER
       if (req.user.role === ROLES.ADMIN) {
         const user: User = await this.usersRepository.findOne({
           where: { id, role: ROLES.USER },
@@ -97,6 +88,7 @@ export class UsersService {
         return user;
       }
 
+      // return the users with role USER
       const user: User = await this.usersRepository.findOneBy({ id });
 
       // we return an error if the condition does not pass
@@ -107,6 +99,7 @@ export class UsersService {
     }
   }
 
+  // Edit user by id
   async editUser({
     id,
     body,
@@ -117,6 +110,7 @@ export class UsersService {
     req: JwtPayload;
   }) {
     try {
+      // Validation email does not exists
       if (body.email) {
         throw new ErrorManager({
           type: 'BAD_REQUEST',
@@ -124,8 +118,10 @@ export class UsersService {
         });
       }
 
+      // IF the email not exist, search the user by id
       const user: User = await this.getUserById({ id, req });
 
+      // We combine the new information that comes to us with the POST method with the user's old information
       const updateUser: UpdateUserDto = Object.assign(user, body);
       await this.usersRepository.update(id, updateUser);
       return updateUser;
@@ -134,6 +130,7 @@ export class UsersService {
     }
   }
 
+  // Delete user by id
   async deleteUser({
     id,
     req,
@@ -142,6 +139,7 @@ export class UsersService {
     req: JwtPayload;
   }): Promise<User> {
     try {
+      // Validation for not delete my own user
       if (Number(id) === req.user.sub) {
         throw new ErrorManager({
           type: 'FORBIDDEN',
@@ -149,18 +147,22 @@ export class UsersService {
         });
       }
 
+      // If not my own user, search user by id
       const user: User = await this.getUserById({ id, req });
 
-      await this.usersRepository.delete(id);
+      // If all conditions pass, a softdelete of the user is done.
+      await this.usersRepository.softDelete(id);
       return user;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
 
-  findByEmail({ email }: { email: string }) {
+  // Search user by email
+  async findByEmail({ email }: { email: string }) {
     try {
-      return this.usersRepository.findOne({ where: { email } });
+      // search user by email
+      return await this.usersRepository.findOne({ where: { email } });
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

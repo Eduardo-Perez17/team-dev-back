@@ -23,24 +23,24 @@ import { UsersService } from './users.service';
 
 // DTO'S
 import { CreateUserDto, ResponseCreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 // Guards
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../../auth/guards/roles.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 // Decorators
-import { Roles } from '../../auth/decorators/roles.decorator';
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 // Commons
-import { ROLES } from '../../commons/models';
-import { JwtPayload } from '../../../src/commons/types';
+import { JwtPayload } from 'src/commons/types';
+import { ROLES } from 'src/commons/models';
 
 // Interceptors
-import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';
+import { ResponseInterceptor } from 'src/commons/interceptors/response.interceptor';
 
 // Entities
 import { User } from './entities/user.entity';
-import { UpdateUserDto } from './dto/update-user.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -49,6 +49,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Create user
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create user.',
@@ -68,15 +69,13 @@ export class UsersController {
     type: () => 'CONFLICT',
     description: 'The email already exists.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN)
   @Post()
-  createUser(
-    @Body() body: CreateUserDto,
-    @Req() req: JwtPayload,
-  ): Promise<User> {
-    return this.usersService.createUser({ body, req });
+  createUser(@Body() body: CreateUserDto): Promise<User> {
+    return this.usersService.createUser({ body });
   }
 
+  // Get All Users
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'List all users.',
@@ -90,12 +89,13 @@ export class UsersController {
     status: 200,
     type: () => User,
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN)
   @Get()
   getAllUsers(@Req() req: JwtPayload): Promise<User[]> {
     return this.usersService.getAllUsers({ req });
   }
 
+  // Get user by id
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get user by id.',
@@ -113,12 +113,13 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN)
   @Get(':id')
   getUserById(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
     return this.usersService.getUserById({ id, req });
   }
 
+  // Edit user by id
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Edit user by id.',
@@ -136,7 +137,7 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN)
   @Put(':id')
   editUser(
     @Param('id') id: number,
@@ -146,6 +147,7 @@ export class UsersController {
     return this.usersService.editUser({ id, body, req });
   }
 
+  // Delete user by id
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Delete user by id.',
@@ -167,7 +169,7 @@ export class UsersController {
     status: 403,
     type: () => 'You are not allowed to delete your own profile.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN)
   @Delete(':id')
   deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
     return this.usersService.deleteUser({ id, req });
