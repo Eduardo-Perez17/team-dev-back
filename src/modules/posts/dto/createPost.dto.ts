@@ -20,9 +20,6 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
   tag: string;
-
-  @IsNotEmpty()
-  imageId: number;
 }
 
 export class ResponseCreatePostDto {

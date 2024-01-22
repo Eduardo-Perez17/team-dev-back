@@ -37,7 +37,7 @@ export class PostsService {
     }
   }
 
-  async createPost({ body }: { body: CreatePostDto }): Promise<Posts> {
+  async createPost({ body }: { body: CreatePostDto }): Promise<any> {
     try {
       // we generate the url of the post
       const separationOfTitle: string = body.title;
@@ -52,18 +52,7 @@ export class PostsService {
         url: separationOfTitleResult,
       });
 
-      // assign image a post
-      const image: Image = await this.imageRepository.findOneBy({
-        id: body.imageId,
-      });
-
-      const assignImagePost: Posts = this.postsRepository.create({
-        ...body,
-        image,
-        createdAt: new Date(),
-      });
-
-      return await this.postsRepository.save(assignImagePost);
+      return await this.postsRepository.save(body);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

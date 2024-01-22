@@ -6,10 +6,7 @@ import {
   Param,
   Post,
   Put,
-  UploadedFile,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -17,13 +14,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { diskStorage } from 'multer';
 
 // Services
 import { PostsService } from './posts.service';
 
 // Dto's
-import { CreatePostDto, ResponseCreatePostDto } from './dto/createPost.dto';
+import { CreatePostDto } from './dto/createPost.dto';
 import { EditPostDto } from './dto/editPost.dto';
 
 // Entities
@@ -36,45 +32,10 @@ import { ROLES } from '../../../src/commons/models';
 // Decorators
 import { Roles } from '../../../src/auth/decorators/roles.decorator';
 
-// Helpers
-import { fileFilter, renameImage } from 'src/commons/helpers';
-
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postService: PostsService) {}
-
-  @ApiBearerAuth()
-  @ApiOperation({
-    summary: 'Upload image.',
-    description: 'this endpoint is for upload an image.',
-  })
-  @ApiBody({
-    type: CreatePostDto,
-    description: 'The fields to be upload image.',
-  })
-  @ApiResponse({
-    status: 201,
-    type: () => ResponseCreatePostDto,
-    description: 'upload image successfully.',
-  })
-  @ApiResponse({
-    status: 401,
-    description: 'image exist.',
-  })
-  @Post('upload')
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: diskStorage({
-        destination: './upload',
-        filename: renameImage,
-      }),
-      fileFilter: fileFilter,
-    }),
-  )
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.postService.uploadFile({ file });
-  }
 
   @ApiBearerAuth()
   @ApiOperation({
