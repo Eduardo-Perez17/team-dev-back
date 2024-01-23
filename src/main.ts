@@ -8,8 +8,14 @@ import { AppModule } from './app.module';
 // Commons
 import { CORS } from './commons/constants';
 
+// Libreries
+import * as morgan from 'morgan';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // use librerie morgan
+  app.use(morgan('dev'));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -19,6 +25,7 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.setGlobalPrefix('api/v1/');
 
   const config = new DocumentBuilder()
     .setTitle('Team dev')

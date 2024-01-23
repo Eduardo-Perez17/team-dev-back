@@ -6,6 +6,8 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -26,13 +28,20 @@ import { EditPostDto } from './dto/editPost.dto';
 import { Posts } from './entities/posts.entity';
 
 // Commons
+import { ResponseInterceptor } from 'src/commons/interceptors/response.interceptor';
 import { ROLES } from 'src/commons/models';
 
 // Decorators
 import { Roles } from 'src/auth/decorators/roles.decorator';
 
+// Auth
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+
 @ApiTags('Posts')
 @Controller('posts')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@UseInterceptors(ResponseInterceptor)
 export class PostsController {
   constructor(private readonly postService: PostsService) {}
 
@@ -76,7 +85,7 @@ export class PostsController {
     status: 201,
     description: 'list all post successfully.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Get()
   getAllPost(): Promise<Posts[]> {
     return this.postService.getAllPost();

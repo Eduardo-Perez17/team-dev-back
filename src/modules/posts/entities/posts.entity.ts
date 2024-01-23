@@ -24,13 +24,13 @@ export class Posts extends BaseEntity implements IPost {
   @Column({ type: 'boolean', default: true })
   published: boolean;
 
-  @Column({ type: 'varchar', length: 50, default: null })
+  @Column({ type: 'varchar', length: 80, default: null })
   tag: string;
 
-  @Column({ type: 'varchar', length: 50, default: null })
+  @Column({ type: 'varchar', length: 150, default: null })
   title: string;
 
-  @Column({ type: 'varchar', length: 50, default: null, unique: true })
+  @Column({ type: 'varchar', length: 150, default: null, unique: true })
   url: string;
 
   @ManyToOne(() => Image, (image) => image.post)

@@ -1,1 +1,11 @@
-1) Tiene que haber una relacion entre usuarios y posts (COMPANY Y PAQUETES)
+PRIMORDIAL:
+  Traer las imagenes de los tags directamente desde el servidor, alojar las imagenes en la tabla de tags
+
+    TABLA TAGS:
+        id
+        tag
+        image
+        relacion con posts (un tag tiene muchos posts)
+
+1) Tiene que haber una relacion entre usuarios y posts (como en COMPANY Y PAQUETES) para saber los posts de cada usuario y asi
+2) Agregar a la tabla de usuario un campo de register boolean. Este campo se seteara a true cuando el usuario setee su contrasena despues de enviarle un correo con un link para setear su contrasena (en la url del link tiene que estar el id de ese usuario para que el back sepa a que usuario se le asignan esos cambios)
