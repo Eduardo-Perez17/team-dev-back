@@ -6,13 +6,14 @@ import { UploadController } from './upload.controller';
 
 // Services
 import { PostsService } from '../posts/posts.service';
+import { TagsService } from '../tags/tags.service';
 
 // Entity
 import { Posts } from '../posts/entities/posts.entity';
-import { Image } from '../posts/entities/image.entity';
+import { Tags } from '../tags/entities/tags.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([Posts, Image])],
+  imports: [TypeOrmModule.forFeature([Posts, Tags])],
   controllers: [UploadController],
-  providers: [PostsService],
+  providers: [PostsService, TagsService],
 })
 export class UploadModule {}

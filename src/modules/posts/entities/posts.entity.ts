@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   // JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -11,7 +12,10 @@ import { BaseEntity } from '../../../commons/baseEntity';
 
 // Interfaces
 import { IPost } from '../../../commons/Interface/post.interface';
-import { Image } from './image.entity';
+
+// Entities
+import { Tags } from 'src/modules/tags/entities/tags.entity';
+import { User } from 'src/modules/users/entities/user.entity';
 
 @Entity({ name: 'Posts' })
 export class Posts extends BaseEntity implements IPost {
@@ -24,15 +28,17 @@ export class Posts extends BaseEntity implements IPost {
   @Column({ type: 'boolean', default: true })
   published: boolean;
 
-  @Column({ type: 'varchar', length: 80, default: null })
-  tag: string;
-
   @Column({ type: 'varchar', length: 150, default: null })
   title: string;
 
   @Column({ type: 'varchar', length: 150, default: null, unique: true })
   url: string;
 
-  @ManyToOne(() => Image, (image) => image.post)
-  image: Image;
+  @ManyToOne(() => Tags, (tags) => tags.post)
+  @JoinColumn({ name: 'tags_id' })
+  tags: Tags;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  @JoinColumn({ name: 'user_id' })
+  user: User;
 }
