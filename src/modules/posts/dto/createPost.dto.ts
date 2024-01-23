@@ -16,8 +16,7 @@ export class CreatePostDto {
   published: boolean;
 
   @IsNotEmpty()
-  @IsString()
-  tag: string;
+  tagsId: number;
 }
 
 export class ResponseCreatePostDto {
@@ -27,7 +26,6 @@ export class ResponseCreatePostDto {
   img: string;
   url: string;
   published: boolean;
-  tag: string;
   deleteAt: Date;
   createdAt: Date;
   updatedAt: Date;

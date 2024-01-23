@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 // Entity
+import { Tags } from '../tags/entities/tags.entity';
 import { Posts } from './entities/posts.entity';
 
 // Dto's
@@ -12,14 +13,18 @@ import { CreatePostDto } from './dto/createPost.dto';
 // Utils
 import { ErrorManager } from 'src/commons/utils/error.manager';
 
+// Services
+import { TagsService } from '../tags/tags.service';
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Posts) private postsRepository: Repository<Posts>,
+    @InjectRepository(Tags) private tagsRepository: Repository<Tags>,
+    private readonly tagsServices: TagsService,
   ) {}
 
   // Create post
-  async createPost({ body }: { body: CreatePostDto }): Promise<any> {
+  async createPost({ body }: { body: CreatePostDto }): Promise<Posts> {
     try {
       // we generate the url of the post
       const separationOfTitle: string = body.title;
@@ -34,7 +39,17 @@ export class PostsService {
         url: separationOfTitleResult,
       });
 
-      return await this.postsRepository.save(body);
+      // Search y save tag post
+      const tagFound: Tags = await this.tagsServices.getTagById({
+        id: body.tagsId,
+      });
+
+      const newPost: Posts = await this.postsRepository.create({
+        ...body,
+        tags: tagFound,
+      });
+
+      return await this.postsRepository.save(newPost);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -44,7 +59,7 @@ export class PostsService {
   async getAllPost(): Promise<Posts[]> {
     try {
       const posts: Posts[] = await this.postsRepository.find({
-        relations: ['image'],
+        relations: ['tags', 'user'],
       });
 
       return posts;
