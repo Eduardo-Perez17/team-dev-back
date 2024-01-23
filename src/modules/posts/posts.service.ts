@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 // Entity
 import { Posts } from './entities/posts.entity';
-import { Image } from './entities/image.entity';
 
 // Dto's
 import { EditPostDto } from './dto/editPost.dto';
@@ -17,26 +16,7 @@ import { ErrorManager } from 'src/commons/utils/error.manager';
 export class PostsService {
   constructor(
     @InjectRepository(Posts) private postsRepository: Repository<Posts>,
-    @InjectRepository(Image) private imageRepository: Repository<Image>,
   ) {}
-
-  // Upload file
-  async uploadFile({ file }: { file: Express.Multer.File }) {
-    try {
-      await this.getFileByName({
-        image: file.originalname,
-      });
-
-      const newImage = this.imageRepository.create({
-        image: file.originalname,
-        createdAt: new Date(),
-      });
-
-      return await this.imageRepository.save(newImage);
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
 
   // Create post
   async createPost({ body }: { body: CreatePostDto }): Promise<any> {
@@ -144,26 +124,6 @@ export class PostsService {
 
       await this.postsRepository.delete(id);
       return post;
-    } catch (error) {
-      throw ErrorManager.createSignatureError(error.message);
-    }
-  }
-
-  // Get file by name
-  async getFileByName({ image }: { image: string }): Promise<Image> {
-    try {
-      const imageFound: Image = await this.imageRepository.findOne({
-        where: { image },
-      });
-
-      if (imageFound) {
-        throw new ErrorManager({
-          type: 'CONFLICT',
-          message: 'This image already exists',
-        });
-      }
-
-      return imageFound;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

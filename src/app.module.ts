@@ -14,6 +14,7 @@ import { UploadModule } from './modules/upload/upload.module';
 import { UsersModule } from './modules/users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { TagsModule } from './modules/tags/tags.module';
 import { AuthModule } from './auth/auth.module';
 
 // Const
@@ -39,6 +40,7 @@ import { join } from 'path';
     AuthModule,
     JwtModule,
     UploadModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AuthService],
