@@ -1,4 +1,4 @@
-import { Repository } from 'typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -72,13 +72,28 @@ export class PostsService {
   }
 
   // Get all post
-  async getAllPost(): Promise<Posts[]> {
+  async getAllPost({
+    limit,
+    page,
+  }: {
+    limit: number;
+    page: number;
+  }): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
     try {
-      const posts: Posts[] = await this.postsRepository.find({
-        relations: ['tags', 'user'],
-      });
+      const offset: number = (page - 1) * limit;
 
-      return posts;
+      const queryBuilder: SelectQueryBuilder<Posts> = this.postsRepository
+        .createQueryBuilder('posts')
+        .innerJoinAndSelect('posts.tags', 'tags')
+        .innerJoinAndSelect('posts.user', 'user')
+        .orderBy('posts.id', 'DESC');
+
+      const [posts, total]: [Posts[], number] = await queryBuilder
+        .take(limit)
+        .skip(offset)
+        .getManyAndCount();
+
+      return { limit: limit, offset: offset, total: total, data: posts };
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
