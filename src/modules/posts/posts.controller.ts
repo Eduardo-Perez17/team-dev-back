@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -93,8 +95,11 @@ export class PostsController {
   })
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get()
-  getAllPost(): Promise<Posts[]> {
-    return this.postService.getAllPost();
+  getAllPost(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(7), ParseIntPipe) limit: number = 7,
+  ): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
+    return this.postService.getAllPost({ limit, page });
   }
 
   // Get post by id
@@ -117,6 +122,7 @@ export class PostsController {
     return this.postService.getPostById({ id });
   }
 
+  // Get Post by url
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'get post by url.',
