@@ -79,7 +79,8 @@ export class PostsController {
     return this.postService.createPost({ body, user: request.user });
   }
 
-  // List all post
+  // List all post (NORMAL)
+  // TODO: crear un filter type
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'List all post.',
@@ -96,10 +97,11 @@ export class PostsController {
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get()
   getAllPost(
+    @Query('search') search: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(7), ParseIntPipe) limit: number = 7,
   ): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
-    return this.postService.getAllPost({ limit, page });
+    return this.postService.getAllPost({ limit, page, search });
   }
 
   // Get post by id

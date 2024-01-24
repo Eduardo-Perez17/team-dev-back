@@ -8,11 +8,36 @@ import { Tags } from './entities/tags.entity';
 // Utils
 import { ErrorManager } from 'src/commons/utils/error.manager';
 
+// Dtos
+import { TagsCreatetDto } from './dto/createTags.dto';
+
 @Injectable()
 export class TagsService {
   constructor(
     @InjectRepository(Tags) private tagsRepository: Repository<Tags>,
   ) {}
+
+  async createTags({ body }: { body: TagsCreatetDto }): Promise<Tags> {
+    try {
+      // Search tag by id
+      const tagFound = await this.tagsRepository.findOneBy({ tag: body.tag });
+
+      if (tagFound) {
+        throw new ErrorManager({
+          type: 'CONFLICT',
+          message: 'This tag exists',
+        });
+      }
+
+      // Create tag
+      const tag = this.tagsRepository.create(body);
+      await this.tagsRepository.save(tag);
+
+      return tag;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
 
   async getAllTags(): Promise<Tags[]> {
     try {

@@ -1,15 +1,31 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 // Services
 import { TagsService } from './tags.service';
+
+// Entities
 import { Tags } from './entities/tags.entity';
-import { ApiBearerAuth } from '@nestjs/swagger';
+
+// Commons
 import { ROLES } from 'src/commons/models';
+
+// Decorators
 import { Roles } from 'src/auth/decorators/roles.decorator';
+
+// Dtos
+import { TagsCreatetDto } from './dto/createTags.dto';
 
 @Controller('tags')
 export class TagsController {
   constructor(private readonly tagsServices: TagsService) {}
+
+  @ApiBearerAuth()
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Post()
+  createTags(@Body() body: TagsCreatetDto): Promise<Tags> {
+    return this.tagsServices.createTags({ body });
+  }
 
   @ApiBearerAuth()
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
