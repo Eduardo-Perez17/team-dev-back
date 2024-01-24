@@ -17,6 +17,9 @@ import { IPost } from '../../../commons/Interface/post.interface';
 import { Tags } from 'src/modules/tags/entities/tags.entity';
 import { User } from 'src/modules/users/entities/user.entity';
 
+// Enums
+import { TypePost } from 'src/commons/enums/typePost.enums';
+
 @Entity({ name: 'Posts' })
 export class Posts extends BaseEntity implements IPost {
   @PrimaryGeneratedColumn()
@@ -33,6 +36,9 @@ export class Posts extends BaseEntity implements IPost {
 
   @Column({ type: 'varchar', length: 150, default: null, unique: true })
   url: string;
+
+  @Column({ type: 'enum', enum: TypePost })
+  type: TypePost;
 
   @ManyToOne(() => Tags, (tags) => tags.post)
   @JoinColumn({ name: 'tags_id' })

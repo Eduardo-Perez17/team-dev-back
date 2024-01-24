@@ -1,4 +1,8 @@
-import { IsBoolean, IsNotEmpty, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+
+// Enums
+import { TypePost } from 'src/commons/enums/typePost.enums';
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -14,6 +18,11 @@ export class CreatePostDto {
   @IsNotEmpty()
   @IsBoolean()
   published: boolean;
+
+  @IsNotEmpty()
+  @Transform(({ value }) => ('' + value).toLocaleUpperCase())
+  @IsEnum(TypePost)
+  type: TypePost;
 
   @IsNotEmpty()
   tagsId: number;
