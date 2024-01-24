@@ -57,7 +57,7 @@ export class UsersService {
   async getAllUsers({ req }: { req: JwtPayload }): Promise<User[]> {
     try {
       // If role is ADMIN list all role USER
-      if (req.user.role === ROLES.ADMIN) {
+      if (req.role === ROLES.ADMIN) {
         return this.usersRepository.find({ where: { role: ROLES.USER } });
       }
 
@@ -78,7 +78,7 @@ export class UsersService {
   }): Promise<User> {
     try {
       // If role is ADMIN i want to return the users that are only USER
-      if (req.user.role === ROLES.ADMIN) {
+      if (req.role === ROLES.ADMIN) {
         const user: User = await this.usersRepository.findOne({
           where: { id, role: ROLES.USER },
         });
@@ -140,7 +140,7 @@ export class UsersService {
   }): Promise<User> {
     try {
       // Validation for not delete my own user
-      if (Number(id) === req.user.sub) {
+      if (Number(id) === req.sub) {
         throw new ErrorManager({
           type: 'FORBIDDEN',
           message: 'You are not allowed to delete your own profile',

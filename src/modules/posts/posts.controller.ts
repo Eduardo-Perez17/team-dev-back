@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
+  Req,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -21,7 +23,7 @@ import {
 import { PostsService } from './posts.service';
 
 // Dto's
-import { CreatePostDto } from './dto/createPost.dto';
+import { CreatePostDto, ResponseCreatePostDto } from './dto/createPost.dto';
 import { EditPostDto } from './dto/editPost.dto';
 
 // Entities
@@ -30,6 +32,7 @@ import { Posts } from './entities/posts.entity';
 // Commons
 import { ResponseInterceptor } from 'src/commons/interceptors/response.interceptor';
 import { ROLES } from 'src/commons/models';
+import { JwtPayload } from 'src/commons/types';
 
 // Decorators
 import { Roles } from 'src/auth/decorators/roles.decorator';
@@ -67,8 +70,11 @@ export class PostsController {
   })
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Post()
-  createPost(@Body() body: CreatePostDto): Promise<Posts> {
-    return this.postService.createPost({ body });
+  createPost(
+    @Body() body: CreatePostDto,
+    @Req() request: JwtPayload,
+  ): Promise<Posts> {
+    return this.postService.createPost({ body, user: request.user });
   }
 
   // List all post
@@ -82,10 +88,10 @@ export class PostsController {
     description: 'The fields to be list all post.',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     description: 'list all post successfully.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get()
   getAllPost(): Promise<Posts[]> {
     return this.postService.getAllPost();
@@ -102,13 +108,32 @@ export class PostsController {
     description: 'The fields to be get post by id.',
   })
   @ApiResponse({
-    status: 201,
+    status: 200,
     type: () => Post,
   })
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get(':id')
-  getPostById(@Param() id: number): Promise<Posts> {
+  getPostById(@Param('id', ParseIntPipe) id: number): Promise<Posts> {
     return this.postService.getPostById({ id });
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'get post by url.',
+    description: 'this endpoint is for get post by url.',
+  })
+  @ApiBody({
+    type: ResponseCreatePostDto,
+    description: 'The fields to be get post by url.',
+  })
+  @ApiResponse({
+    status: 200,
+    type: () => Post,
+  })
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
+  @Get('url/:url')
+  getPostByUrl(@Param('url') url: string): Promise<Posts> {
+    return this.postService.getPostByUrl({ url });
   }
 
   // Update post by id
@@ -129,7 +154,7 @@ export class PostsController {
     status: 404,
     description: 'this post not exist.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Put(':id')
   updatePost(
     @Param('id') id: number,
@@ -156,7 +181,7 @@ export class PostsController {
     status: 404,
     description: 'this post not exist.',
   })
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Delete(':id')
   deletePost(@Param('id') id: number) {
     return this.postService.deletePost({ id });

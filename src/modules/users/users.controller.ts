@@ -92,7 +92,7 @@ export class UsersController {
   @Roles(ROLES.SUPERADMIN)
   @Get()
   getAllUsers(@Req() req: JwtPayload): Promise<User[]> {
-    return this.usersService.getAllUsers({ req });
+    return this.usersService.getAllUsers({ req: req.user });
   }
 
   // Get user by id
@@ -116,7 +116,7 @@ export class UsersController {
   @Roles(ROLES.SUPERADMIN)
   @Get(':id')
   getUserById(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
-    return this.usersService.getUserById({ id, req });
+    return this.usersService.getUserById({ id, req: req.user });
   }
 
   // Edit user by id
@@ -144,7 +144,7 @@ export class UsersController {
     @Body() body: UpdateUserDto,
     @Req() req: JwtPayload,
   ): Promise<UpdateUserDto> {
-    return this.usersService.editUser({ id, body, req });
+    return this.usersService.editUser({ id, body, req: req.user });
   }
 
   // Delete user by id
@@ -172,6 +172,6 @@ export class UsersController {
   @Roles(ROLES.SUPERADMIN)
   @Delete(':id')
   deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
-    return this.usersService.deleteUser({ id, req });
+    return this.usersService.deleteUser({ id, req: req.user });
   }
 }
