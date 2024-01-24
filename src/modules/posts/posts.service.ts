@@ -12,19 +12,28 @@ import { CreatePostDto } from './dto/createPost.dto';
 
 // Utils
 import { ErrorManager } from 'src/commons/utils/error.manager';
+import { JwtPayload } from 'src/commons/types';
 
 // Services
 import { TagsService } from '../tags/tags.service';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Posts) private postsRepository: Repository<Posts>,
-    @InjectRepository(Tags) private tagsRepository: Repository<Tags>,
+    private readonly usersService: UsersService,
     private readonly tagsServices: TagsService,
   ) {}
 
   // Create post
-  async createPost({ body }: { body: CreatePostDto }): Promise<Posts> {
+  async createPost({
+    body,
+    user,
+  }: {
+    body: CreatePostDto;
+    user: JwtPayload;
+  }): Promise<Posts> {
     try {
       // we generate the url of the post
       const separationOfTitle: string = body.title;
@@ -39,6 +48,12 @@ export class PostsService {
         url: separationOfTitleResult,
       });
 
+      // Search y save user post
+      const userFound: User = await this.usersService.getUserById({
+        id: user.sub,
+        req: user,
+      });
+
       // Search y save tag post
       const tagFound: Tags = await this.tagsServices.getTagById({
         id: body.tagsId,
@@ -46,6 +61,7 @@ export class PostsService {
 
       const newPost: Posts = await this.postsRepository.create({
         ...body,
+        user: userFound,
         tags: tagFound,
       });
 
@@ -91,7 +107,31 @@ export class PostsService {
   // Get post by id
   async getPostById({ id }: { id: number }): Promise<Posts> {
     try {
-      const post: Posts = await this.postsRepository.findOneBy({ id });
+      const post: Posts = await this.postsRepository.findOne({
+        where: { id: id },
+        relations: ['user', 'tags'],
+      });
+
+      if (!post) {
+        throw new ErrorManager({
+          type: 'NOT_FOUND',
+          message: 'This post not found',
+        });
+      }
+
+      return post;
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  // Get post by url
+  async getPostByUrl({ url }: { url: string }): Promise<Posts> {
+    try {
+      const post: Posts = await this.postsRepository.findOne({
+        where: { url: url },
+        relations: ['user', 'tags'],
+      });
 
       if (!post) {
         throw new ErrorManager({
