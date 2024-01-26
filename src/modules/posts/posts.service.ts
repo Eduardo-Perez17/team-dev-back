@@ -74,22 +74,34 @@ export class PostsService {
   // Get all post normal
   async getAllPost({
     limit,
-    page,
     search,
+    page,
+    type,
   }: {
     limit: number;
     page: number;
+    type: string;
     search: string;
   }): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
     try {
       const offset: number = (page - 1) * limit;
 
-      const queryBuilder: SelectQueryBuilder<Posts> = this.postsRepository
+      let queryBuilder: SelectQueryBuilder<Posts> = this.postsRepository
         .createQueryBuilder('posts')
         .innerJoinAndSelect('posts.tags', 'tags')
         .innerJoinAndSelect('posts.user', 'user')
-        .where('posts.type = :search', { search })
+        .where('posts.type = :type', { type })
         .orderBy('posts.id', 'DESC');
+
+      if (search) {
+        queryBuilder = queryBuilder.where(
+          'posts.title LIKE :title OR posts.content LIKE :content',
+          {
+            title: `%${search}%`,
+            content: `%${search}%`,
+          },
+        );
+      }
 
       const [posts, total]: [Posts[], number] = await queryBuilder
         .take(limit)
