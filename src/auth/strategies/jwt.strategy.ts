@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 
 // Config
-import config from 'config/config';
+import config from '../../../config/config';
 
 // Models
 import { PayloadToken } from '../models/token.model';
