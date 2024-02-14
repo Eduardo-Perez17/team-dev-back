@@ -10,11 +10,11 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 
 // Commons
-import { returnErrorManager } from 'src/commons/utils/returnError.manager';
-import { ErrorManager } from 'src/commons/utils/error.manager';
-import { REJEXT_PASSWORD } from 'src/commons/constants';
-import { JwtPayload } from 'src/commons/types';
-import { ROLES } from 'src/commons/models';
+import { REJEXT_PASSWORD } from '../../commons/constants/rejext-password.constants';
+import { returnErrorManager } from '../../commons/utils/returnError.manager';
+import { ErrorManager } from '../../commons/utils/error.manager';
+import { JwtPayload } from '../../commons/types';
+import { ROLES } from '../../commons/models';
 
 @Injectable()
 export class UsersService {

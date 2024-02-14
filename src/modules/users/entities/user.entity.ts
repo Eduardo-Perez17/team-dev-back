@@ -18,7 +18,7 @@ import { BaseEntity } from '../../../commons/baseEntity';
 import { IUser } from '../../../commons/Interface/user.interface';
 
 // Entities
-import { Posts } from 'src/modules/posts/entities/posts.entity';
+import { Posts } from '../../posts/entities/posts.entity';
 
 @Entity({ name: 'users' })
 export class User extends BaseEntity implements IUser {

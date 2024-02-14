@@ -4,12 +4,14 @@ import {
   ApiBody,
   ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import * as fs from 'fs';
 
 // Helpers
 import { ErrorManager } from 'src/commons/utils/error.manager';
 
+@ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
   @ApiBearerAuth()

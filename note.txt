@@ -1,3 +1,14 @@
-1) Tiene que haber una relacion entre usuarios y posts (como en COMPANY Y PAQUETES) para saber los posts de cada usuario y asi✅
+Modificaciones:
 
-2) Agregar a la tabla de usuario un campo de register boolean. Este campo se seteara a true cuando el usuario setee su contrasena despues de enviarle un correo con un link para setear su contrasena (en la url del link tiene que estar el id de ese usuario para que el back sepa a que usuario se le asignan esos cambios)
+  1) Agregar a la tabla de usuario un campo de register boolean. Este campo se seteara a true cuando el usuario setee su contrasena despues de enviarle un correo con un link para setear su contrasena (en la url del link tiene que estar el id de ese usuario para que el back sepa a que usuario se le asignan esos cambios)
+
+Refactorizacion:
+
+  1) En el endpoint de listar los tags, al mandar a traer todos los tags, tienes que recibir un param para saber si se busca retornar los tags de forma aleatoria o en el orden que esten en la base de datos
+
+Documentacion:
+
+  1) Terminar la documentacion para los siguientes endpoints
+
+      UPLOAD
+      TAGS

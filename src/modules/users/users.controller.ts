@@ -26,18 +26,18 @@ import { CreateUserDto, ResponseCreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 // Guards
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../../auth/guards/roles.guard';
 
 // Decorators
-import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Roles } from '../../auth/decorators/roles.decorator';
 
 // Commons
-import { JwtPayload } from 'src/commons/types';
-import { ROLES } from 'src/commons/models';
+import { JwtPayload } from '../../commons/types';
+import { ROLES } from '../../commons/models';
 
 // Interceptors
-import { ResponseInterceptor } from 'src/commons/interceptors/response.interceptor';
+import { ResponseInterceptor } from '../../commons/interceptors/response.interceptor';
 
 // Entities
 import { User } from './entities/user.entity';

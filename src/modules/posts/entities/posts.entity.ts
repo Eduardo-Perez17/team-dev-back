@@ -2,7 +2,6 @@ import {
   Column,
   Entity,
   JoinColumn,
-  // JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -14,11 +13,11 @@ import { BaseEntity } from '../../../commons/baseEntity';
 import { IPost } from '../../../commons/Interface/post.interface';
 
 // Entities
-import { Tags } from 'src/modules/tags/entities/tags.entity';
-import { User } from 'src/modules/users/entities/user.entity';
+import { Tags } from '../../tags/entities/tags.entity';
+import { User } from '../../users/entities/user.entity';
 
 // Enums
-import { TypePost } from 'src/commons/enums/typePost.enums';
+import { TypePost } from '../../../commons/enums/typePost.enums';
 
 @Entity({ name: 'Posts' })
 export class Posts extends BaseEntity implements IPost {
