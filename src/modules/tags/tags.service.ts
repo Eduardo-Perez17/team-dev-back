@@ -41,7 +41,8 @@ export class TagsService {
 
   async getAllTags(): Promise<Tags[]> {
     try {
-      return this.tagsRepository.find();
+      const tags = await this.tagsRepository.find();
+      return this.shuffleArray(tags);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
@@ -62,5 +63,13 @@ export class TagsService {
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
+  }
+
+  private shuffleArray(array: any[]): any[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }
