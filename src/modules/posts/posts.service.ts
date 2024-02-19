@@ -213,4 +213,22 @@ export class PostsService {
       throw ErrorManager.createSignatureError(error.message);
     }
   }
+
+  // Saved post by id for user
+  async userSavedPost({ id, req }: { id: number, req: JwtPayload }): Promise<Posts> {
+    try {
+      const post: Posts = await this.getPostById({ id })
+      const user: User = await this.usersService.getUserById({ id: req.sub, req })
+
+      const savedPostUser = this.postsRepository.create({
+        ...post,
+        saved_posts: user
+      })
+
+      await this.postsRepository.save(savedPostUser)
+      return savedPostUser
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
 }

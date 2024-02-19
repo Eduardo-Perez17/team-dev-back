@@ -194,4 +194,33 @@ export class PostsController {
   deletePost(@Param('id') id: number) {
     return this.postService.deletePost({ id });
   }
+
+  // User saved post
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'saved post by id.',
+    description: 'this endpoint is for saved post by id for user.',
+  })
+  @ApiBody({
+    type: CreatePostDto,
+    description: 'The fields to be saved post by id.',
+  })
+  @ApiResponse({
+    status: 200,
+    type: () => Post,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'this post not exist.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'this post it was not saved correctly.',
+  })
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @UseGuards(JwtAuthGuard)
+  @Get('saved/:id')
+  userSavedPost(@Param('id') id: number, @Req() req: JwtPayload): Promise<Posts> {
+    return this.postService.userSavedPost({ id, req: req.user })
+  }
 }

@@ -46,4 +46,8 @@ export class Posts extends BaseEntity implements IPost {
   @ManyToOne(() => User, (user) => user.posts)
   @JoinColumn({ name: 'user_id' })
   user: User;
+
+  @ManyToOne(() => User, (user) => user.posts)
+  @JoinColumn({ name: 'user_saved_id' })
+  saved_posts: User;
 }
