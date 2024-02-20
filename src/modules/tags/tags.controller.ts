@@ -10,11 +10,11 @@ import { Tags } from './entities/tags.entity';
 // Commons
 import { ROLES } from 'src/commons/models';
 
-// Decorators
-import { Roles } from 'src/auth/decorators/roles.decorator';
-
 // Dtos
 import { TagsCreatetDto } from './dto/createTags.dto';
+
+// Auth
+import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('Tags')
