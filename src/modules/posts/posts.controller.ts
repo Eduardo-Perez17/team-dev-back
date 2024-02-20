@@ -70,6 +70,7 @@ export class PostsController {
     type: () => 'CONFLICT',
     description: 'The url already exists.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Post()
   createPost(
@@ -93,6 +94,7 @@ export class PostsController {
     status: 200,
     description: 'list all post successfully.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get()
   getAllPost(
@@ -118,6 +120,7 @@ export class PostsController {
     status: 200,
     type: () => Post,
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get(':id')
   getPostById(@Param('id', ParseIntPipe) id: number): Promise<Posts> {
@@ -138,6 +141,7 @@ export class PostsController {
     status: 200,
     type: () => Post,
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get('url/:url')
   getPostByUrl(@Param('url') url: string): Promise<Posts> {
@@ -162,6 +166,7 @@ export class PostsController {
     status: 404,
     description: 'this post not exist.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Put(':id')
   updatePost(
@@ -189,9 +194,39 @@ export class PostsController {
     status: 404,
     description: 'this post not exist.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Delete(':id')
   deletePost(@Param('id') id: number) {
     return this.postService.deletePost({ id });
+  }
+
+  // User saved post
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'saved post by id.',
+    description: 'this endpoint is for saved post by id for user.',
+  })
+  @ApiBody({
+    type: CreatePostDto,
+    description: 'The fields to be saved post by id.',
+  })
+  @ApiResponse({
+    status: 200,
+    type: () => Post,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'this post not exist.',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'this post it was not saved correctly.',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Get('saved/:id')
+  userSavedPost(@Param('id') id: number, @Req() req: JwtPayload): Promise<Posts> {
+    return this.postService.userSavedPost({ id, req: req.user })
   }
 }

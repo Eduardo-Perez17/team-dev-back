@@ -44,8 +44,11 @@ export class User extends BaseEntity implements IUser {
   @Column({ type: 'boolean', default: false })
   register: boolean;
 
-  @OneToMany(() => Posts, (posts) => posts)
+  @OneToMany(() => Posts, (posts) => posts.user) // Create post
   posts: Posts[];
+
+  @OneToMany(() => Posts, (posts) => posts.saved_posts) // Saved post
+  saved_posts: Posts[];
 
   @BeforeInsert()
   async hashPassword() {
