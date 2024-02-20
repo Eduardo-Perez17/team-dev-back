@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 // Services
@@ -15,6 +15,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 
 // Dtos
 import { TagsCreatetDto } from './dto/createTags.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('Tags')
 @Controller('tags')
@@ -22,6 +23,7 @@ export class TagsController {
   constructor(private readonly tagsServices: TagsService) {}
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Post()
   createTags(@Body() body: TagsCreatetDto): Promise<Tags> {
@@ -29,6 +31,7 @@ export class TagsController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Get()
   getAllTags(): Promise<Tags[]> {
@@ -36,6 +39,7 @@ export class TagsController {
   }
 
   @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
   @Get(':id')
   getTagById(@Param('id') id: number): Promise<Tags> {

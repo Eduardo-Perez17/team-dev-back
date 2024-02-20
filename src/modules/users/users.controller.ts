@@ -69,6 +69,7 @@ export class UsersController {
     type: () => 'CONFLICT',
     description: 'The email already exists.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN)
   @Post()
   createUser(@Body() body: CreateUserDto): Promise<User> {
@@ -89,6 +90,7 @@ export class UsersController {
     status: 200,
     type: () => User,
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN)
   @Get()
   getAllUsers(@Req() req: JwtPayload): Promise<User[]> {
@@ -113,6 +115,7 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN)
   @Get(':id')
   getUserById(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
@@ -137,6 +140,7 @@ export class UsersController {
     status: 404,
     type: () => 'This user not found.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN)
   @Put(':id')
   editUser(
@@ -169,6 +173,7 @@ export class UsersController {
     status: 403,
     type: () => 'You are not allowed to delete your own profile.',
   })
+  @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN)
   @Delete(':id')
   deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
