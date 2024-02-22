@@ -76,12 +76,16 @@ export class PostsService {
     limit,
     search,
     page,
+    filter,
     type,
+    user,
   }: {
     limit: number;
     page: number;
     type: string;
+    filter: string;
     search: string;
+    user: JwtPayload
   }): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
     try {
       const offset: number = (page - 1) * limit;
@@ -101,6 +105,14 @@ export class PostsService {
             content: `%${search}%`,
           },
         );
+      }
+
+      if (filter) {
+        if (filter === 'saved') {
+          queryBuilder
+            .leftJoinAndSelect('posts.saved_posts', 'saved_posts')
+            .where({ saved_posts: user.sub });
+        }
       }
 
       const [posts, total]: [Posts[], number] = await queryBuilder
@@ -177,6 +189,8 @@ export class PostsService {
   }
 
   // Update post by id
+   // TODO: Un usuario solo puede dar like a un post una unica vez
+   // y si el campo like ya tiene un like y el usario le quiere dar dislike el like se tiene que descontar y ahora ser un dislike
   async updatePost({
     id,
     body,

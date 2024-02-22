@@ -6,8 +6,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   UseGuards,
@@ -98,12 +98,14 @@ export class PostsController {
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get()
   getAllPost(
+    @Req() req: JwtPayload,
     @Query('type') type: string,
     @Query('search') search: string,
+    @Query('filter') filter: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
     @Query('limit', new DefaultValuePipe(7), ParseIntPipe) limit: number = 7,
   ): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
-    return this.postService.getAllPost({ limit, page, search, type });
+    return this.postService.getAllPost({ limit, page, filter, search, type, user: req.user });
   }
 
   // Get post by id
@@ -168,7 +170,7 @@ export class PostsController {
   })
   @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
-  @Put(':id')
+  @Patch(':id')
   updatePost(
     @Param('id') id: number,
     @Body() body: EditPostDto,
@@ -224,7 +226,7 @@ export class PostsController {
     description: 'this post it was not saved correctly.',
   })
   @UseGuards(JwtAuthGuard)
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get('saved/:id')
   userSavedPost(@Param('id') id: number, @Req() req: JwtPayload): Promise<Posts> {
     return this.postService.userSavedPost({ id, req: req.user })
