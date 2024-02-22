@@ -189,6 +189,8 @@ export class PostsService {
   }
 
   // Update post by id
+   // TODO: Un usuario solo puede dar like a un post una unica vez
+   // y si el campo like ya tiene un like y el usario le quiere dar dislike el like se tiene que descontar y ahora ser un dislike
   async updatePost({
     id,
     body,

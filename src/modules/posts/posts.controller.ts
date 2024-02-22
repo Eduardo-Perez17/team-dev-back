@@ -6,8 +6,8 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
-  Put,
   Query,
   Req,
   UseGuards,
@@ -170,7 +170,7 @@ export class PostsController {
   })
   @UseGuards(JwtAuthGuard)
   @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
-  @Put(':id')
+  @Patch(':id')
   updatePost(
     @Param('id') id: number,
     @Body() body: EditPostDto,
@@ -226,7 +226,7 @@ export class PostsController {
     description: 'this post it was not saved correctly.',
   })
   @UseGuards(JwtAuthGuard)
-  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Get('saved/:id')
   userSavedPost(@Param('id') id: number, @Req() req: JwtPayload): Promise<Posts> {
     return this.postService.userSavedPost({ id, req: req.user })
