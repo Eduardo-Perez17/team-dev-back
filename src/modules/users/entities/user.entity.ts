@@ -50,6 +50,12 @@ export class User extends BaseEntity implements IUser {
   @OneToMany(() => Posts, (posts) => posts.saved_posts) // Saved post
   saved_posts: Posts[];
 
+  @OneToMany(() => Posts, (posts) => posts.likes)
+  like: Posts[];
+
+  @OneToMany(() => Posts, (posts) => posts.dislikes)
+  dislikes: Posts[];
+
   @BeforeInsert()
   async hashPassword() {
     if (!this.password) return;

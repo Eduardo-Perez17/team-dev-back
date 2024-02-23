@@ -174,8 +174,9 @@ export class PostsController {
   updatePost(
     @Param('id') id: number,
     @Body() body: EditPostDto,
+    @Req() req: JwtPayload
   ): Promise<EditPostDto> {
-    return this.postService.updatePost({ id, body });
+    return this.postService.updatePost({ id, body, user: req.user });
   }
 
   // Delete post by
