@@ -39,11 +39,13 @@ export class Posts extends BaseEntity implements IPost {
   @Column({ type: 'enum', enum: TypePost })
   type: TypePost;
 
-  @Column({ type: 'bigint', default: 0 })
-  likes: number
+  @ManyToOne(() => User, (user) => user.like)
+  @JoinColumn({ name: 'user_like_id' })
+  likes: User
 
-  @Column({ type: 'bigint', default: 0 })
-  dislikes: number
+  @ManyToOne(() => User, (user) => user.dislikes)
+  @JoinColumn({ name: 'user_dislikes_id' })
+  dislikes: User
 
   @ManyToOne(() => Tags, (tags) => tags.post)
   @JoinColumn({ name: 'tags_id' })

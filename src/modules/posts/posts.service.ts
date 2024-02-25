@@ -85,7 +85,7 @@ export class PostsService {
     type: string;
     filter: string;
     search: string;
-    user: JwtPayload
+    user: JwtPayload;
   }): Promise<{ limit: number; offset: number; total: number; data: Posts[] }> {
     try {
       const offset: number = (page - 1) * limit;
@@ -172,7 +172,7 @@ export class PostsService {
     try {
       const post: Posts = await this.postsRepository.findOne({
         where: { url: url },
-        relations: ['user', 'tags'],
+        relations: ['user', 'tags', 'likes', 'dislikes'],
       });
 
       if (!post) {
@@ -189,17 +189,45 @@ export class PostsService {
   }
 
   // Update post by id
-   // TODO: Un usuario solo puede dar like a un post una unica vez
-   // y si el campo like ya tiene un like y el usario le quiere dar dislike el like se tiene que descontar y ahora ser un dislike
+  // TODO: Un usuario solo puede dar like a un post una unica vez
+  // y si el campo like ya tiene un like y el usario le quiere dar dislike el like se tiene que descontar y ahora ser un dislike
   async updatePost({
     id,
     body,
+    user,
   }: {
     id: number;
     body: EditPostDto;
+    user: JwtPayload;
   }): Promise<Posts> {
     try {
       const post: Posts = await this.getPostById({ id });
+      const userFound: User = await this.usersService.getUserById({
+        id: user.sub,
+        req: user,
+      });
+
+      if (body.likes) {
+        const newLike: Posts = this.postsRepository.create({
+          ...post,
+          likes: userFound,
+        });
+
+        await this.postsRepository.save(newLike);
+
+        await this.postsRepository.update(id, newLike);
+        return newLike
+      } else if (body.dislikes) {
+        const newDisLike: Posts = this.postsRepository.create({
+          ...post,
+          dislikes: userFound,
+        });
+
+        await this.postsRepository.save(newDisLike);
+
+        await this.postsRepository.update(id, newDisLike);
+        return newDisLike
+      }
 
       const updatePost: Posts = Object.assign(post, body);
       await this.postsRepository.update(id, updatePost);
@@ -229,18 +257,27 @@ export class PostsService {
   }
 
   // Saved post by id for user
-  async userSavedPost({ id, req }: { id: number, req: JwtPayload }): Promise<Posts> {
+  async userSavedPost({
+    id,
+    req,
+  }: {
+    id: number;
+    req: JwtPayload;
+  }): Promise<Posts> {
     try {
-      const post: Posts = await this.getPostById({ id })
-      const user: User = await this.usersService.getUserById({ id: req.sub, req })
+      const post: Posts = await this.getPostById({ id });
+      const user: User = await this.usersService.getUserById({
+        id: req.sub,
+        req,
+      });
 
       const savedPostUser = this.postsRepository.create({
         ...post,
-        saved_posts: user
-      })
+        saved_posts: user,
+      });
 
-      await this.postsRepository.save(savedPostUser)
-      return savedPostUser
+      await this.postsRepository.save(savedPostUser);
+      return savedPostUser;
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }
