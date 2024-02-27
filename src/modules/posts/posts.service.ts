@@ -4,24 +4,27 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 // Entity
 import { Tags } from '../tags/entities/tags.entity';
+import { User } from '../users/entities/user.entity';
 import { Posts } from './entities/posts.entity';
 
 // Dto's
 import { EditPostDto } from './dto/editPost.dto';
 import { CreatePostDto } from './dto/createPost.dto';
 
-// Utils
+// Commons
 import { ErrorManager } from 'src/commons/utils/error.manager';
+import { TypePost } from 'src/commons/enums/typePost.enums';
 import { JwtPayload } from 'src/commons/types';
 
 // Services
 import { TagsService } from '../tags/tags.service';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/entities/user.entity';
+
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Posts) private postsRepository: Repository<Posts>,
+    @InjectRepository(Tags) private tagsRepository: Repository<Tags>,
     private readonly usersService: UsersService,
     private readonly tagsServices: TagsService,
   ) {}
@@ -126,6 +129,24 @@ export class PostsService {
     }
   }
 
+  async postAnalitycs() {
+    try {
+      const posts = await this.postsRepository.find();
+      const tecnologys = await this.tagsRepository.find()
+
+      const postsCourse = posts.filter((post) => post.type === TypePost.COURSE);
+      const postsNormal = posts.filter((post) => post.type === TypePost.NORMAL);
+
+      const postsCourseValue = postsCourse.length;
+      const postsNormalValue = postsNormal.length;
+      const tecnologysValue = tecnologys.length
+
+      return { postsCount: postsNormalValue, courseCount: postsCourseValue, tagsCount: tecnologysValue };
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
   // Find by url
   async findByUrl({ url }: { url: string }): Promise<Posts> {
     try {
@@ -216,7 +237,7 @@ export class PostsService {
         await this.postsRepository.save(newLike);
 
         await this.postsRepository.update(id, newLike);
-        return newLike
+        return newLike;
       } else if (body.dislikes) {
         const newDisLike: Posts = this.postsRepository.create({
           ...post,
@@ -226,7 +247,7 @@ export class PostsService {
         await this.postsRepository.save(newDisLike);
 
         await this.postsRepository.update(id, newDisLike);
-        return newDisLike
+        return newDisLike;
       }
 
       const updatePost: Posts = Object.assign(post, body);

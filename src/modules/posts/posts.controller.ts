@@ -108,6 +108,14 @@ export class PostsController {
     return this.postService.getAllPost({ limit, page, filter, search, type, user: req.user });
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
+  @Get('analytics')
+  postAnalitycs() {
+    return this.postService.postAnalitycs()
+  }
+
   // Get post by id
   @ApiBearerAuth()
   @ApiOperation({
@@ -205,6 +213,7 @@ export class PostsController {
   }
 
   // User saved post
+  // TODO : QUITAR
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'saved post by id.',
