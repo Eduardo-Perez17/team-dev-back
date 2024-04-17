@@ -70,7 +70,7 @@ export class UsersController {
     description: 'The email already exists.',
   })
   @UseGuards(JwtAuthGuard)
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Post()
   createUser(@Body() body: CreateUserDto): Promise<User> {
     return this.usersService.createUser({ body });
