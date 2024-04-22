@@ -11,7 +11,12 @@ import { User } from './entities/user.entity';
 
 // Commons
 import { REJEXT_PASSWORD } from '../../commons/constants/rejext-password.constants';
+import { verificationAccountMailer } from 'src/commons/helpers/mailer.helpers';
 import { returnErrorManager } from '../../commons/utils/returnError.manager';
+import {
+  codeGenerate,
+  codeEmailVerification,
+} from 'src/commons/helpers/generateCode.helpers';
 import { ErrorManager } from '../../commons/utils/error.manager';
 import { JwtPayload } from '../../commons/types';
 import { ROLES } from '../../commons/models';
@@ -47,6 +52,8 @@ export class UsersService {
       body.role.toLowerCase();
 
       const newUser: User = this.usersRepository.create(body);
+
+      verificationAccountMailer({ user: body.email, code: codeGenerate() });
       return this.usersRepository.save(newUser);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
@@ -163,6 +170,35 @@ export class UsersService {
     try {
       // search user by email
       return await this.usersRepository.findOne({ where: { email } });
+    } catch (error) {
+      throw ErrorManager.createSignatureError(error.message);
+    }
+  }
+
+  async codeVerification({ user, codeBody }: { user: JwtPayload; codeBody: { codeBody: string } }) {
+    try {
+      if (codeBody) {
+        if (codeBody?.codeBody === codeEmailVerification) {
+          const userEditVerify = await this.editUser({
+            id: user?.user?.sub,
+            req: user,
+            body: {
+              register: true,
+            },
+          });
+          return {
+            message: 'This user has been successfully registered',
+            register: true,
+            userEditVerify,
+          };
+        } else {
+          return {
+            statusCode: 409,
+            register: false,
+            message: 'This user could not register correctly',
+          };
+        }
+      }
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);
     }

@@ -70,7 +70,7 @@ export class UsersController {
     description: 'The email already exists.',
   })
   @UseGuards(JwtAuthGuard)
-  @Roles(ROLES.SUPERADMIN)
+  @Roles(ROLES.SUPERADMIN, ROLES.ADMIN, ROLES.USER)
   @Post()
   createUser(@Body() body: CreateUserDto): Promise<User> {
     return this.usersService.createUser({ body });
@@ -178,5 +178,13 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
     return this.usersService.deleteUser({ id, req: req.user });
+  }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLES.ADMIN, ROLES.SUPERADMIN, ROLES.USER)
+  @Post('verification')
+  codeVerification(@Body() body, @Req() req: JwtPayload) {
+    return this.usersService.codeVerification({ user: req, codeBody: body  })
   }
 }
