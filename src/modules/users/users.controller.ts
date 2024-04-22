@@ -179,4 +179,12 @@ export class UsersController {
   deleteUser(@Param('id') id: number, @Req() req: JwtPayload): Promise<User> {
     return this.usersService.deleteUser({ id, req: req.user });
   }
+
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  @Roles(ROLES.ADMIN, ROLES.SUPERADMIN, ROLES.USER)
+  @Post('verification')
+  codeVerification(@Body() body, @Req() req: JwtPayload) {
+    return this.usersService.codeVerification({ user: req, codeBody: body  })
+  }
 }
