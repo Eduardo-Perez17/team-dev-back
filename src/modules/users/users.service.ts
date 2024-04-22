@@ -11,7 +11,9 @@ import { User } from './entities/user.entity';
 
 // Commons
 import { REJEXT_PASSWORD } from '../../commons/constants/rejext-password.constants';
+import { verificationAccountMailer } from 'src/commons/helpers/mailer.helpers';
 import { returnErrorManager } from '../../commons/utils/returnError.manager';
+import { codeGenerate } from 'src/commons/helpers/generateCode.helpers';
 import { ErrorManager } from '../../commons/utils/error.manager';
 import { JwtPayload } from '../../commons/types';
 import { ROLES } from '../../commons/models';
@@ -47,6 +49,8 @@ export class UsersService {
       body.role.toLowerCase();
 
       const newUser: User = this.usersRepository.create(body);
+
+      verificationAccountMailer({ user: body.email, code: codeGenerate() })
       return this.usersRepository.save(newUser);
     } catch (error) {
       throw ErrorManager.createSignatureError(error.message);

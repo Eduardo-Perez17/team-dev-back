@@ -25,13 +25,13 @@ export class User extends BaseEntity implements IUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 30, name: 'first_name' })
+  @Column({ type: 'varchar', length: 100, name: 'first_name' })
   firstName: string;
 
-  @Column({ type: 'varchar', length: 30, name: 'last_name' })
+  @Column({ type: 'varchar', length: 100, name: 'last_name' })
   lastName: string;
 
-  @Column({ type: 'varchar', length: 30, unique: true })
+  @Column({ type: 'varchar', length: 100, unique: true })
   email: string;
 
   @Exclude()
